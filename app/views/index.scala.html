@@ -1,0 +1,105 @@
+<html>
+    <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/bootstrap.min.css")">
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
+    <title>Index</title>
+    <body>
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Brand</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container well">
+        <form class="form-horizontal" id="filter">
+            <fieldset>
+                <legend>Filter</legend>
+            <div class="form-group">
+                <label for="land" class="col-xs-2 control-label">Land:</label>
+                <div class="col-xs-10">
+                <select id="land" class="form-control">
+
+                </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="vorname" class="col-xs-2 control-label">Vorname:</label>
+                <div class="col-xs-10">
+                    <input type="text" class="form-control" id="vorname">
+                </div>
+             </div>
+             <div class="form-group">
+                 <label for="nachname" class="col-xs-2 control-label">Nachname:</label>
+                 <div class="col-xs-10">
+                     <input type="text" class="form-control" id="nachname">
+                 </div>
+             </div>
+            <div class="form-group">
+                <label for="plz" class="col-xs-2 control-label">PLZ:</label>
+                <div class="col-xs-10">
+                    <input type="text" class="form-control" id="plz">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="ort" class="col-xs-2 control-label">Ort:</label>
+                <div class="col-xs-10">
+                    <input type="text" class="form-control" id="ort">
+                </div>
+            </div>
+                <div class="form-group">
+                    <div class="col-lg-10 col-lg-offset-2">
+                        <button type="submit" class="btn btn-primary">Daten zeigen</button>
+                    </div>
+                </div>
+                </fieldset>
+        </form>
+        </div>
+        <div id="result" class="container"></div>
+        <script>
+        $(document).ready(function(){
+            $.ajax({
+                type: "POST",
+                url: "@routes.Application.fillLand()",
+                success: function(data){
+                   // console.log(data);
+                    var items = '';
+                    $.each(data, function(key, value){
+                        items += '<option value=' + value.id + '>' + value.land + '</option>';
+                    });
+                    $("#land").append('<option value="">'+'</option>');
+                    $("#land").append(items);
+                }
+            });
+        });
+        </script>
+        <script>
+           $("#filter").submit(function(event){
+            event.preventDefault();
+            alert("dddd");
+            var request = {"land":$("#land").val(), "vorname":$("#vorname").val(), "nachname":$("#nachname").val(), "plz":$("#plz").val(), "ort":$("#ort").val()};
+            $.ajax({
+                type: "POST",
+                url: "@routes.Application.filter()",
+                data: JSON.stringify(request),
+                contentType: "application/json",
+                success: function(data){
+                   console.log(data);
+                   var header = '<table class="table table-hover"><thead><th>ID</th><th>LaenderId</th><th>Vornane</th><th>Nachname</th><th>Typ</th></thead><tbody>'
+                   var body = '';
+                   $.each(data, function(key, value){
+                        body += '<tr><td>'+value.id+'</td><td>'+value.laenderId+'</td><td>'+value.vorname+'</td><td>'+value.nachname+'</td><td>'+value.bezeichnung+'</td></tr>';
+                    });
+                   var footer = '</tbody></table>'
+                   $("#result").append(header+body+footer);
+                }
+            });
+
+           });
+
+        </script>
+
+    </body>
+</html>
+
