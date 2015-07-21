@@ -32,6 +32,7 @@ object Application extends Controller {
       Json.obj("id"-> t._1, "laenderId"->t._2, "vorname" -> t._3,"nachname" -> t._4, "bezeichnung"->t._5)
     }
   }
+
   def filter = DBAction { implicit request =>
     val json = request.body.asJson.get
 
@@ -42,30 +43,35 @@ object Application extends Controller {
     var plz = (json \ "plz").as[String]
     var ort = (json \ "ort").as[String]
 
-    if(land_id == ""){
-      land_id = "-1"
+
+    var result = Userstammdaten
+
+    if(land_id != ""){
+      result.filter(p=>p.laenderId === land_id.toInt)
     }
-    if(vorname == ""){
-      vorname = "-1"
+    if(vorname != ""){
+      result.filter(p=>p.vorname === vorname)
     }
-    if(nachname == ""){
-      nachname = "-1"
+    if(nachname != ""){
+      result.filter(p=>p.nachname === nachname)
     }
-    if(plz == ""){
-      plz = "-1"
+    if(plz != ""){
+      result.filter(p=>p.postleitzahl === plz)
     }
     if(ort == ""){
-      ort = "-1"
+      result.filter(p=>p.ort === ort)
     }
 
-   // if(land_id == ""){
-   //   result = Userstammdaten.filter(p=> p.vorname === vorname || p.nachname === nachname || p.postleitzahl === plz || p.ort === ort)
-   // }s
-
-    val result = Userstammdaten.filter(p=>p.laenderId === land_id.toInt || p.vorname === vorname || p.nachname === nachname || p.postleitzahl === plz || p.ort === ort).join(UserstammdatenUsertyp)
+    result.join(UserstammdatenUsertyp)
       .on(_.id === _.userstammdatenId).join(Usertyp)
       .on(_._2.usertypId === _.id).filter(p=>p._2.bezeichnung === "Vermieter" || p._2.bezeichnung === "Bürgschaftsbegünstigter")
       .map{case(p, a) =>(p._1.id, p._1.laenderId, p._1.vorname, p._1.nachname, a.bezeichnung)}.list
+
+ //     val result = Userstammdaten.filter(p=>p.laenderId === land_id.toInt || p.vorname === vorname || p.nachname === nachname || p.postleitzahl === plz || p.ort === ort)
+ //     .join(UserstammdatenUsertyp)
+ //     .on(_.id === _.userstammdatenId).join(Usertyp)
+ //     .on(_._2.usertypId === _.id).filter(p=>p._2.bezeichnung === "Vermieter" || p._2.bezeichnung === "Bürgschaftsbegünstigter")
+ //     .map{case(p, a) =>(p._1.id, p._1.laenderId, p._1.vorname, p._1.nachname, a.bezeichnung)}.list
 
 
     Ok(Json.toJson(result))
