@@ -3,10 +3,13 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
-POST    /                           controllers.Application.fillLand
-POST    /filter                           controllers.Application.filter
+GET         /                    controllers.Search.index
+POST        /                    controllers.Search.fillLand
+POST        /filter              controllers.Search.filter
+POST        /fastFilter          controllers.Search.fastFilter
+POST        /addUser             controllers.Search.addUser
+POST       /checkAdded           controllers.Search.checkAdded
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET         /assets/*file        controllers.Assets.at(path="/public", file)
 
     

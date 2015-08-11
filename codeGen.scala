@@ -12,7 +12,7 @@ object MySQLPlayground {
 
 
     val model = db.withSession { implicit session =>
-      val tables = (Seq("sprache", "laender", "usertyp","userstammdaten_usertyp","userstammdaten","userstammdatenkontakt","wohnobjekt","gespraechsinformationen","kontaktperson","verwaltung_vermieter_info"))
+      val tables = (Seq("besuchsrapporte","wohnobject_state","wohnobject_dictionary","gespraechspartner_stammdaten","sprache", "laender", "usertyp","userstammdaten_usertyp","userstammdaten","userstammdatenkontakt","wohnobjekt","gespraechsinformationen","kontaktperson","verwaltung_vermieter_info"))
       val t = Option(MySQLDriver.defaultTables.filter(t => tables.contains(t.name.name)))
       MySQLDriver.profile.createModel(t) // you can filter specific tables here
     }

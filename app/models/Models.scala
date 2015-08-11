@@ -16,7 +16,45 @@ trait Tables {
   import scala.slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val ddl = Gespraechsinformationen.ddl ++ Kontaktperson.ddl ++ Laender.ddl ++ Sprache.ddl ++ Userstammdaten.ddl ++ Userstammdatenkontakt.ddl ++ UserstammdatenUsertyp.ddl ++ Usertyp.ddl ++ VerwaltungVermieterInfo.ddl ++ Wohnobjekt.ddl
+  lazy val ddl = Besuchsrapporte.ddl ++ Gespraechsinformationen.ddl ++ GespraechspartnerStammdaten.ddl ++ Kontaktperson.ddl ++ Laender.ddl ++ Sprache.ddl ++ Userstammdaten.ddl ++ Userstammdatenkontakt.ddl ++ UserstammdatenUsertyp.ddl ++ Usertyp.ddl ++ VerwaltungVermieterInfo.ddl ++ WohnobjectDictionary.ddl ++ WohnobjectState.ddl ++ Wohnobjekt.ddl
+
+  /** Entity class storing rows of table Besuchsrapporte
+    *  @param id Database column id DBType(INT), AutoInc, PrimaryKey
+    *  @param gespraechspartnerStammdatenId Database column gespraechspartner_stammdaten_id DBType(INT)
+    *  @param userstammdatenId Database column userstammdaten_id DBType(INT)
+    *  @param datum Database column datum DBType(DATETIME)
+    *  @param memo Database column memo DBType(LONGTEXT), Length(2147483647,true)
+    *  @param kooperationsvertrag Database column kooperationsvertrag DBType(TINYINT)
+    *  @param nachsterBesuch Database column nachster_besuch DBType(DATE) */
+  case class BesuchsrapporteRow(id: Int, gespraechspartnerStammdatenId: Int, userstammdatenId: Int, datum: java.sql.Timestamp, memo: String, kooperationsvertrag: Byte, nachsterBesuch: java.sql.Date)
+  /** GetResult implicit for fetching BesuchsrapporteRow objects using plain SQL queries */
+  implicit def GetResultBesuchsrapporteRow(implicit e0: GR[Int], e1: GR[java.sql.Timestamp], e2: GR[String], e3: GR[Byte], e4: GR[java.sql.Date]): GR[BesuchsrapporteRow] = GR{
+    prs => import prs._
+      BesuchsrapporteRow.tupled((<<[Int], <<[Int], <<[Int], <<[java.sql.Timestamp], <<[String], <<[Byte], <<[java.sql.Date]))
+  }
+  /** Table description of table besuchsrapporte. Objects of this class serve as prototypes for rows in queries. */
+  class Besuchsrapporte(_tableTag: Tag) extends Table[BesuchsrapporteRow](_tableTag, "besuchsrapporte") {
+    def * = (id, gespraechspartnerStammdatenId, userstammdatenId, datum, memo, kooperationsvertrag, nachsterBesuch) <> (BesuchsrapporteRow.tupled, BesuchsrapporteRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (id.?, gespraechspartnerStammdatenId.?, userstammdatenId.?, datum.?, memo.?, kooperationsvertrag.?, nachsterBesuch.?).shaped.<>({r=>import r._; _1.map(_=> BesuchsrapporteRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id DBType(INT), AutoInc, PrimaryKey */
+    val id: Column[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column gespraechspartner_stammdaten_id DBType(INT) */
+    val gespraechspartnerStammdatenId: Column[Int] = column[Int]("gespraechspartner_stammdaten_id")
+    /** Database column userstammdaten_id DBType(INT) */
+    val userstammdatenId: Column[Int] = column[Int]("userstammdaten_id")
+    /** Database column datum DBType(DATETIME) */
+    val datum: Column[java.sql.Timestamp] = column[java.sql.Timestamp]("datum")
+    /** Database column memo DBType(LONGTEXT), Length(2147483647,true) */
+    val memo: Column[String] = column[String]("memo", O.Length(2147483647,varying=true))
+    /** Database column kooperationsvertrag DBType(TINYINT) */
+    val kooperationsvertrag: Column[Byte] = column[Byte]("kooperationsvertrag")
+    /** Database column nachster_besuch DBType(DATE) */
+    val nachsterBesuch: Column[java.sql.Date] = column[java.sql.Date]("nachster_besuch")
+  }
+  /** Collection-like TableQuery object for table Besuchsrapporte */
+  lazy val Besuchsrapporte = new TableQuery(tag => new Besuchsrapporte(tag))
 
   /** Entity class storing rows of table Gespraechsinformationen
     *  @param id Database column id DBType(INT UNSIGNED), AutoInc, PrimaryKey
@@ -72,6 +110,110 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table Gespraechsinformationen */
   lazy val Gespraechsinformationen = new TableQuery(tag => new Gespraechsinformationen(tag))
+
+  /** Row type of table GespraechspartnerStammdaten */
+  type GespraechspartnerStammdatenRow = HCons[Int,HCons[Option[String],HCons[Option[Int],HCons[Option[String],HCons[Option[String],HCons[Option[String],HCons[Option[Int],HCons[Option[String],HCons[Option[String],HCons[Option[String],HCons[Option[String],HCons[Option[String],HCons[Option[String],HCons[Option[String],HCons[Option[String],HCons[Option[String],HCons[Option[java.sql.Date],HCons[Option[String],HCons[Option[Int],HCons[Option[Int],HCons[Option[java.sql.Timestamp],HCons[Option[java.sql.Timestamp],HCons[Option[Int],HCons[Option[Byte],HCons[String,HCons[String,HCons[Option[Byte],HCons[Option[Boolean],HCons[Option[String],HCons[Option[Boolean],HCons[Option[Boolean],HCons[Option[Boolean],HCons[Option[Boolean],HCons[Option[Int],HCons[Option[String],HCons[Option[String],HCons[Option[Int],HCons[Option[Boolean],HNil]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+  /** Constructor for GespraechspartnerStammdatenRow providing default values if available in the database schema. */
+  def GespraechspartnerStammdatenRow(id: Int, anrede: Option[String] = None, titelId: Option[Int] = None, firma: Option[String] = None, vorname: Option[String] = None, nachname: Option[String] = None, klientelId: Option[Int] = None, strasse: Option[String] = None, plz: Option[String] = None, ort: Option[String] = None, postfach: Option[String] = None, vorwahlTelefon: Option[String] = None, telefon: Option[String] = None, vorwahlFax: Option[String] = None, fax: Option[String] = None, email: Option[String] = None, taetigkeitSeit: Option[java.sql.Date] = None, besonderheit: Option[String] = None, laenderId: Option[Int] = None, rollenId: Option[Int] = None, firstLogin: Option[java.sql.Timestamp] = None, lastLogin: Option[java.sql.Timestamp] = None, numberOfLogin: Option[Int] = None, userguide: Option[Byte] = None, username: String, pw: String, aktiv: Option[Byte] = None, geloescht: Option[Boolean] = None, nachrichtInfozeit: Option[String] = None, onlineredakteur: Option[Boolean] = None, outboundAufgaben: Option[Boolean] = None, businessAnmeldungen: Option[Boolean] = None, outboundVerwalter: Option[Boolean] = None, loginFehler: Option[Int] = Some(0), autoPasswort: Option[String] = None, partnerIdBeschraenkung: Option[String] = None, spracheId: Option[Int] = None, outboundAbrechnung: Option[Boolean] = None): GespraechspartnerStammdatenRow = {
+    id :: anrede :: titelId :: firma :: vorname :: nachname :: klientelId :: strasse :: plz :: ort :: postfach :: vorwahlTelefon :: telefon :: vorwahlFax :: fax :: email :: taetigkeitSeit :: besonderheit :: laenderId :: rollenId :: firstLogin :: lastLogin :: numberOfLogin :: userguide :: username :: pw :: aktiv :: geloescht :: nachrichtInfozeit :: onlineredakteur :: outboundAufgaben :: businessAnmeldungen :: outboundVerwalter :: loginFehler :: autoPasswort :: partnerIdBeschraenkung :: spracheId :: outboundAbrechnung :: HNil
+  }
+  /** GetResult implicit for fetching GespraechspartnerStammdatenRow objects using plain SQL queries */
+  implicit def GetResultGespraechspartnerStammdatenRow(implicit e0: GR[Int], e1: GR[Option[String]], e2: GR[Option[Int]], e3: GR[Option[java.sql.Date]], e4: GR[Option[java.sql.Timestamp]], e5: GR[Option[Byte]], e6: GR[String], e7: GR[Option[Boolean]]): GR[GespraechspartnerStammdatenRow] = GR{
+    prs => import prs._
+      <<[Int] :: <<?[String] :: <<?[Int] :: <<?[String] :: <<?[String] :: <<?[String] :: <<?[Int] :: <<?[String] :: <<?[String] :: <<?[String] :: <<?[String] :: <<?[String] :: <<?[String] :: <<?[String] :: <<?[String] :: <<?[String] :: <<?[java.sql.Date] :: <<?[String] :: <<?[Int] :: <<?[Int] :: <<?[java.sql.Timestamp] :: <<?[java.sql.Timestamp] :: <<?[Int] :: <<?[Byte] :: <<[String] :: <<[String] :: <<?[Byte] :: <<?[Boolean] :: <<?[String] :: <<?[Boolean] :: <<?[Boolean] :: <<?[Boolean] :: <<?[Boolean] :: <<?[Int] :: <<?[String] :: <<?[String] :: <<?[Int] :: <<?[Boolean] :: HNil
+  }
+  /** Table description of table gespraechspartner_stammdaten. Objects of this class serve as prototypes for rows in queries. */
+  class GespraechspartnerStammdaten(_tableTag: Tag) extends Table[GespraechspartnerStammdatenRow](_tableTag, "gespraechspartner_stammdaten") {
+    def * = id :: anrede :: titelId :: firma :: vorname :: nachname :: klientelId :: strasse :: plz :: ort :: postfach :: vorwahlTelefon :: telefon :: vorwahlFax :: fax :: email :: taetigkeitSeit :: besonderheit :: laenderId :: rollenId :: firstLogin :: lastLogin :: numberOfLogin :: userguide :: username :: pw :: aktiv :: geloescht :: nachrichtInfozeit :: onlineredakteur :: outboundAufgaben :: businessAnmeldungen :: outboundVerwalter :: loginFehler :: autoPasswort :: partnerIdBeschraenkung :: spracheId :: outboundAbrechnung :: HNil
+
+    /** Database column id DBType(INT UNSIGNED), AutoInc, PrimaryKey */
+    val id: Column[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column anrede DBType(VARCHAR), Length(255,true), Default(None) */
+    val anrede: Column[Option[String]] = column[Option[String]]("anrede", O.Length(255,varying=true), O.Default(None))
+    /** Database column titel_id DBType(INT UNSIGNED), Default(None) */
+    val titelId: Column[Option[Int]] = column[Option[Int]]("titel_id", O.Default(None))
+    /** Database column firma DBType(VARCHAR), Length(255,true), Default(None) */
+    val firma: Column[Option[String]] = column[Option[String]]("firma", O.Length(255,varying=true), O.Default(None))
+    /** Database column vorname DBType(VARCHAR), Length(255,true), Default(None) */
+    val vorname: Column[Option[String]] = column[Option[String]]("vorname", O.Length(255,varying=true), O.Default(None))
+    /** Database column nachname DBType(VARCHAR), Length(255,true), Default(None) */
+    val nachname: Column[Option[String]] = column[Option[String]]("nachname", O.Length(255,varying=true), O.Default(None))
+    /** Database column klientel_id DBType(INT UNSIGNED), Default(None) */
+    val klientelId: Column[Option[Int]] = column[Option[Int]]("klientel_id", O.Default(None))
+    /** Database column strasse DBType(VARCHAR), Length(255,true), Default(None) */
+    val strasse: Column[Option[String]] = column[Option[String]]("strasse", O.Length(255,varying=true), O.Default(None))
+    /** Database column plz DBType(VARCHAR), Length(255,true), Default(None) */
+    val plz: Column[Option[String]] = column[Option[String]]("plz", O.Length(255,varying=true), O.Default(None))
+    /** Database column ort DBType(VARCHAR), Length(255,true), Default(None) */
+    val ort: Column[Option[String]] = column[Option[String]]("ort", O.Length(255,varying=true), O.Default(None))
+    /** Database column postfach DBType(VARCHAR), Length(255,true), Default(None) */
+    val postfach: Column[Option[String]] = column[Option[String]]("postfach", O.Length(255,varying=true), O.Default(None))
+    /** Database column vorwahl_telefon DBType(VARCHAR), Length(255,true), Default(None) */
+    val vorwahlTelefon: Column[Option[String]] = column[Option[String]]("vorwahl_telefon", O.Length(255,varying=true), O.Default(None))
+    /** Database column telefon DBType(VARCHAR), Length(255,true), Default(None) */
+    val telefon: Column[Option[String]] = column[Option[String]]("telefon", O.Length(255,varying=true), O.Default(None))
+    /** Database column vorwahl_fax DBType(VARCHAR), Length(255,true), Default(None) */
+    val vorwahlFax: Column[Option[String]] = column[Option[String]]("vorwahl_fax", O.Length(255,varying=true), O.Default(None))
+    /** Database column fax DBType(VARCHAR), Length(255,true), Default(None) */
+    val fax: Column[Option[String]] = column[Option[String]]("fax", O.Length(255,varying=true), O.Default(None))
+    /** Database column email DBType(VARCHAR), Length(255,true), Default(None) */
+    val email: Column[Option[String]] = column[Option[String]]("email", O.Length(255,varying=true), O.Default(None))
+    /** Database column taetigkeit_seit DBType(DATE), Default(None) */
+    val taetigkeitSeit: Column[Option[java.sql.Date]] = column[Option[java.sql.Date]]("taetigkeit_seit", O.Default(None))
+    /** Database column besonderheit DBType(VARCHAR), Length(255,true), Default(None) */
+    val besonderheit: Column[Option[String]] = column[Option[String]]("besonderheit", O.Length(255,varying=true), O.Default(None))
+    /** Database column laender_id DBType(INT UNSIGNED), Default(None) */
+    val laenderId: Column[Option[Int]] = column[Option[Int]]("laender_id", O.Default(None))
+    /** Database column rollen_id DBType(INT UNSIGNED), Default(None) */
+    val rollenId: Column[Option[Int]] = column[Option[Int]]("rollen_id", O.Default(None))
+    /** Database column first_login DBType(DATETIME), Default(None) */
+    val firstLogin: Column[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("first_login", O.Default(None))
+    /** Database column last_login DBType(DATETIME), Default(None) */
+    val lastLogin: Column[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("last_login", O.Default(None))
+    /** Database column number_of_login DBType(INT UNSIGNED), Default(None) */
+    val numberOfLogin: Column[Option[Int]] = column[Option[Int]]("number_of_login", O.Default(None))
+    /** Database column userguide DBType(TINYINT), Default(None) */
+    val userguide: Column[Option[Byte]] = column[Option[Byte]]("userguide", O.Default(None))
+    /** Database column username DBType(VARCHAR), Length(255,true) */
+    val username: Column[String] = column[String]("username", O.Length(255,varying=true))
+    /** Database column pw DBType(VARCHAR), Length(255,true) */
+    val pw: Column[String] = column[String]("pw", O.Length(255,varying=true))
+    /** Database column aktiv DBType(TINYINT), Default(None) */
+    val aktiv: Column[Option[Byte]] = column[Option[Byte]]("aktiv", O.Default(None))
+    /** Database column geloescht DBType(BIT), Default(None) */
+    val geloescht: Column[Option[Boolean]] = column[Option[Boolean]]("geloescht", O.Default(None))
+    /** Database column nachricht_infozeit DBType(VARCHAR), Length(255,true), Default(None) */
+    val nachrichtInfozeit: Column[Option[String]] = column[Option[String]]("nachricht_infozeit", O.Length(255,varying=true), O.Default(None))
+    /** Database column onlineredakteur DBType(BIT), Default(None) */
+    val onlineredakteur: Column[Option[Boolean]] = column[Option[Boolean]]("onlineredakteur", O.Default(None))
+    /** Database column outbound_aufgaben DBType(BIT), Default(None) */
+    val outboundAufgaben: Column[Option[Boolean]] = column[Option[Boolean]]("outbound_aufgaben", O.Default(None))
+    /** Database column business_anmeldungen DBType(BIT), Default(None) */
+    val businessAnmeldungen: Column[Option[Boolean]] = column[Option[Boolean]]("business_anmeldungen", O.Default(None))
+    /** Database column outbound_verwalter DBType(BIT), Default(None) */
+    val outboundVerwalter: Column[Option[Boolean]] = column[Option[Boolean]]("outbound_verwalter", O.Default(None))
+    /** Database column login_fehler DBType(INT UNSIGNED), Default(Some(0)) */
+    val loginFehler: Column[Option[Int]] = column[Option[Int]]("login_fehler", O.Default(Some(0)))
+    /** Database column auto_passwort DBType(VARCHAR), Length(255,true), Default(None) */
+    val autoPasswort: Column[Option[String]] = column[Option[String]]("auto_passwort", O.Length(255,varying=true), O.Default(None))
+    /** Database column partner_id_beschraenkung DBType(VARCHAR), Length(255,true), Default(None) */
+    val partnerIdBeschraenkung: Column[Option[String]] = column[Option[String]]("partner_id_beschraenkung", O.Length(255,varying=true), O.Default(None))
+    /** Database column sprache_id DBType(INT UNSIGNED), Default(None) */
+    val spracheId: Column[Option[Int]] = column[Option[Int]]("sprache_id", O.Default(None))
+    /** Database column outbound_abrechnung DBType(BIT), Default(None) */
+    val outboundAbrechnung: Column[Option[Boolean]] = column[Option[Boolean]]("outbound_abrechnung", O.Default(None))
+
+    /** Index over (laenderId) (database name laender_id) */
+    val index1 = index("laender_id", laenderId :: HNil)
+    /** Index over (rollenId) (database name rollen_id) */
+    val index2 = index("rollen_id", rollenId :: HNil)
+    /** Index over (titelId) (database name titel_id) */
+    val index3 = index("titel_id", titelId :: HNil)
+    /** Index over (username) (database name username) */
+    val index4 = index("username", username :: HNil)
+  }
+  /** Collection-like TableQuery object for table GespraechspartnerStammdaten */
+  lazy val GespraechspartnerStammdaten = new TableQuery(tag => new GespraechspartnerStammdaten(tag))
 
   /** Entity class storing rows of table Kontaktperson
     *  @param id Database column id DBType(INT), AutoInc, PrimaryKey
@@ -617,34 +759,146 @@ trait Tables {
   /** Entity class storing rows of table VerwaltungVermieterInfo
     *  @param id Database column id DBType(INT), AutoInc, PrimaryKey
     *  @param userstammdatenId Database column userstammdaten_id DBType(INT)
-    *  @param gespraechspartnerStammdatenId Database column gespraechspartner_stammdaten_id DBType(INT)
-    *  @param website Database column webSite DBType(VARCHAR), Length(100,true)
-    *  @param potencial Database column potencial DBType(INT) */
-  case class VerwaltungVermieterInfoRow(id: Int, userstammdatenId: Int, gespraechspartnerStammdatenId: Int, website: String, potencial: Int)
+    *  @param gespraechspartnerStammdatenId Database column gespraechspartner_stammdaten_id DBType(INT), Default(None)
+    *  @param website Database column webSite DBType(VARCHAR), Length(100,true), Default(None)
+    *  @param potencial Database column potencial DBType(INT), Default(None)
+    *  @param linkHomepage Database column link_homepage DBType(TINYINT), Default(None)
+    *  @param logoPartner Database column logo_partner DBType(TINYINT), Default(None)
+    *  @param linkObject Database column link_object DBType(TINYINT), Default(None)
+    *  @param antragsformular Database column antragsformular DBType(TINYINT), Default(None)
+    *  @param erstvermietung Database column erstvermietung DBType(TINYINT), Default(None)
+    *  @param logoZugestellt Database column logo_zugestellt DBType(DATE), Default(None)
+    *  @param schnittstelleErwunscht Database column schnittstelle_erwunscht DBType(VARCHAR), Length(45,true), Default(None)
+    *  @param bemerkungen Database column bemerkungen DBType(LONGTEXT), Length(2147483647,true), Default(None)
+    *  @param plattform Database column plattform DBType(VARCHAR), Length(45,true), Default(None)
+    *  @param schulungErwunscht Database column schulung_erwunscht DBType(TINYINT), Default(None)
+    *  @param newsletterErwunscht Database column newsletter_erwunscht DBType(TINYINT), Default(None)
+    *  @param zustellDatum Database column zustell_datum DBType(DATE), Default(None)
+    *  @param antwortDatum Database column antwort_datum DBType(DATE), Default(None)
+    *  @param kontaktId Database column kontakt_id DBType(INT), Default(None) */
+  case class VerwaltungVermieterInfoRow(id: Int, userstammdatenId: Int, gespraechspartnerStammdatenId: Option[Int] = None, website: Option[String] = None, potencial: Option[Int] = None, linkHomepage: Option[Byte] = None, logoPartner: Option[Byte] = None, linkObject: Option[Byte] = None, antragsformular: Option[Byte] = None, erstvermietung: Option[Byte] = None, logoZugestellt: Option[java.sql.Date] = None, schnittstelleErwunscht: Option[String] = None, bemerkungen: Option[String] = None, plattform: Option[String] = None, schulungErwunscht: Option[Byte] = None, newsletterErwunscht: Option[Byte] = None, zustellDatum: Option[java.sql.Date] = None, antwortDatum: Option[java.sql.Date] = None, kontaktId: Option[Int] = None)
   /** GetResult implicit for fetching VerwaltungVermieterInfoRow objects using plain SQL queries */
-  implicit def GetResultVerwaltungVermieterInfoRow(implicit e0: GR[Int], e1: GR[String]): GR[VerwaltungVermieterInfoRow] = GR{
+  implicit def GetResultVerwaltungVermieterInfoRow(implicit e0: GR[Int], e1: GR[Option[Int]], e2: GR[Option[String]], e3: GR[Option[Byte]], e4: GR[Option[java.sql.Date]]): GR[VerwaltungVermieterInfoRow] = GR{
     prs => import prs._
-      VerwaltungVermieterInfoRow.tupled((<<[Int], <<[Int], <<[Int], <<[String], <<[Int]))
+      VerwaltungVermieterInfoRow.tupled((<<[Int], <<[Int], <<?[Int], <<?[String], <<?[Int], <<?[Byte], <<?[Byte], <<?[Byte], <<?[Byte], <<?[Byte], <<?[java.sql.Date], <<?[String], <<?[String], <<?[String], <<?[Byte], <<?[Byte], <<?[java.sql.Date], <<?[java.sql.Date], <<?[Int]))
   }
   /** Table description of table verwaltung_vermieter_info. Objects of this class serve as prototypes for rows in queries. */
   class VerwaltungVermieterInfo(_tableTag: Tag) extends Table[VerwaltungVermieterInfoRow](_tableTag, "verwaltung_vermieter_info") {
-    def * = (id, userstammdatenId, gespraechspartnerStammdatenId, website, potencial) <> (VerwaltungVermieterInfoRow.tupled, VerwaltungVermieterInfoRow.unapply)
+    def * = (id, userstammdatenId, gespraechspartnerStammdatenId, website, potencial, linkHomepage, logoPartner, linkObject, antragsformular, erstvermietung, logoZugestellt, schnittstelleErwunscht, bemerkungen, plattform, schulungErwunscht, newsletterErwunscht, zustellDatum, antwortDatum, kontaktId) <> (VerwaltungVermieterInfoRow.tupled, VerwaltungVermieterInfoRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (id.?, userstammdatenId.?, gespraechspartnerStammdatenId.?, website.?, potencial.?).shaped.<>({r=>import r._; _1.map(_=> VerwaltungVermieterInfoRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (id.?, userstammdatenId.?, gespraechspartnerStammdatenId, website, potencial, linkHomepage, logoPartner, linkObject, antragsformular, erstvermietung, logoZugestellt, schnittstelleErwunscht, bemerkungen, plattform, schulungErwunscht, newsletterErwunscht, zustellDatum, antwortDatum, kontaktId).shaped.<>({r=>import r._; _1.map(_=> VerwaltungVermieterInfoRow.tupled((_1.get, _2.get, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id DBType(INT), AutoInc, PrimaryKey */
     val id: Column[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
     /** Database column userstammdaten_id DBType(INT) */
     val userstammdatenId: Column[Int] = column[Int]("userstammdaten_id")
-    /** Database column gespraechspartner_stammdaten_id DBType(INT) */
-    val gespraechspartnerStammdatenId: Column[Int] = column[Int]("gespraechspartner_stammdaten_id")
-    /** Database column webSite DBType(VARCHAR), Length(100,true) */
-    val website: Column[String] = column[String]("webSite", O.Length(100,varying=true))
-    /** Database column potencial DBType(INT) */
-    val potencial: Column[Int] = column[Int]("potencial")
+    /** Database column gespraechspartner_stammdaten_id DBType(INT), Default(None) */
+    val gespraechspartnerStammdatenId: Column[Option[Int]] = column[Option[Int]]("gespraechspartner_stammdaten_id", O.Default(None))
+    /** Database column webSite DBType(VARCHAR), Length(100,true), Default(None) */
+    val website: Column[Option[String]] = column[Option[String]]("webSite", O.Length(100,varying=true), O.Default(None))
+    /** Database column potencial DBType(INT), Default(None) */
+    val potencial: Column[Option[Int]] = column[Option[Int]]("potencial", O.Default(None))
+    /** Database column link_homepage DBType(TINYINT), Default(None) */
+    val linkHomepage: Column[Option[Byte]] = column[Option[Byte]]("link_homepage", O.Default(None))
+    /** Database column logo_partner DBType(TINYINT), Default(None) */
+    val logoPartner: Column[Option[Byte]] = column[Option[Byte]]("logo_partner", O.Default(None))
+    /** Database column link_object DBType(TINYINT), Default(None) */
+    val linkObject: Column[Option[Byte]] = column[Option[Byte]]("link_object", O.Default(None))
+    /** Database column antragsformular DBType(TINYINT), Default(None) */
+    val antragsformular: Column[Option[Byte]] = column[Option[Byte]]("antragsformular", O.Default(None))
+    /** Database column erstvermietung DBType(TINYINT), Default(None) */
+    val erstvermietung: Column[Option[Byte]] = column[Option[Byte]]("erstvermietung", O.Default(None))
+    /** Database column logo_zugestellt DBType(DATE), Default(None) */
+    val logoZugestellt: Column[Option[java.sql.Date]] = column[Option[java.sql.Date]]("logo_zugestellt", O.Default(None))
+    /** Database column schnittstelle_erwunscht DBType(VARCHAR), Length(45,true), Default(None) */
+    val schnittstelleErwunscht: Column[Option[String]] = column[Option[String]]("schnittstelle_erwunscht", O.Length(45,varying=true), O.Default(None))
+    /** Database column bemerkungen DBType(LONGTEXT), Length(2147483647,true), Default(None) */
+    val bemerkungen: Column[Option[String]] = column[Option[String]]("bemerkungen", O.Length(2147483647,varying=true), O.Default(None))
+    /** Database column plattform DBType(VARCHAR), Length(45,true), Default(None) */
+    val plattform: Column[Option[String]] = column[Option[String]]("plattform", O.Length(45,varying=true), O.Default(None))
+    /** Database column schulung_erwunscht DBType(TINYINT), Default(None) */
+    val schulungErwunscht: Column[Option[Byte]] = column[Option[Byte]]("schulung_erwunscht", O.Default(None))
+    /** Database column newsletter_erwunscht DBType(TINYINT), Default(None) */
+    val newsletterErwunscht: Column[Option[Byte]] = column[Option[Byte]]("newsletter_erwunscht", O.Default(None))
+    /** Database column zustell_datum DBType(DATE), Default(None) */
+    val zustellDatum: Column[Option[java.sql.Date]] = column[Option[java.sql.Date]]("zustell_datum", O.Default(None))
+    /** Database column antwort_datum DBType(DATE), Default(None) */
+    val antwortDatum: Column[Option[java.sql.Date]] = column[Option[java.sql.Date]]("antwort_datum", O.Default(None))
+    /** Database column kontakt_id DBType(INT), Default(None) */
+    val kontaktId: Column[Option[Int]] = column[Option[Int]]("kontakt_id", O.Default(None))
+
+    /** Index over (gespraechspartnerStammdatenId) (database name gespraechspartner_stammdaten_id) */
+    val index1 = index("gespraechspartner_stammdaten_id", gespraechspartnerStammdatenId)
   }
   /** Collection-like TableQuery object for table VerwaltungVermieterInfo */
   lazy val VerwaltungVermieterInfo = new TableQuery(tag => new VerwaltungVermieterInfo(tag))
+
+  /** Entity class storing rows of table WohnobjectDictionary
+    *  @param id Database column id DBType(INT), AutoInc, PrimaryKey
+    *  @param strasse Database column strasse DBType(VARCHAR), Length(45,true)
+    *  @param hausnummer Database column hausnummer DBType(VARCHAR), Length(45,true)
+    *  @param otheInfoFields Database column othe_info_fields DBType(VARCHAR), Length(45,true)
+    *  @param userstammdatenId Database column userstammdaten_id DBType(INT) */
+  case class WohnobjectDictionaryRow(id: Int, strasse: String, hausnummer: String, otheInfoFields: String, userstammdatenId: Int)
+  /** GetResult implicit for fetching WohnobjectDictionaryRow objects using plain SQL queries */
+  implicit def GetResultWohnobjectDictionaryRow(implicit e0: GR[Int], e1: GR[String]): GR[WohnobjectDictionaryRow] = GR{
+    prs => import prs._
+      WohnobjectDictionaryRow.tupled((<<[Int], <<[String], <<[String], <<[String], <<[Int]))
+  }
+  /** Table description of table wohnobject_dictionary. Objects of this class serve as prototypes for rows in queries. */
+  class WohnobjectDictionary(_tableTag: Tag) extends Table[WohnobjectDictionaryRow](_tableTag, "wohnobject_dictionary") {
+    def * = (id, strasse, hausnummer, otheInfoFields, userstammdatenId) <> (WohnobjectDictionaryRow.tupled, WohnobjectDictionaryRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (id.?, strasse.?, hausnummer.?, otheInfoFields.?, userstammdatenId.?).shaped.<>({r=>import r._; _1.map(_=> WohnobjectDictionaryRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id DBType(INT), AutoInc, PrimaryKey */
+    val id: Column[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column strasse DBType(VARCHAR), Length(45,true) */
+    val strasse: Column[String] = column[String]("strasse", O.Length(45,varying=true))
+    /** Database column hausnummer DBType(VARCHAR), Length(45,true) */
+    val hausnummer: Column[String] = column[String]("hausnummer", O.Length(45,varying=true))
+    /** Database column othe_info_fields DBType(VARCHAR), Length(45,true) */
+    val otheInfoFields: Column[String] = column[String]("othe_info_fields", O.Length(45,varying=true))
+    /** Database column userstammdaten_id DBType(INT) */
+    val userstammdatenId: Column[Int] = column[Int]("userstammdaten_id")
+  }
+  /** Collection-like TableQuery object for table WohnobjectDictionary */
+  lazy val WohnobjectDictionary = new TableQuery(tag => new WohnobjectDictionary(tag))
+
+  /** Entity class storing rows of table WohnobjectState
+    *  @param id Database column id DBType(INT), AutoInc, PrimaryKey
+    *  @param dateAdded Database column date_added DBType(DATETIME)
+    *  @param miete Database column miete DBType(VARCHAR), Length(45,true)
+    *  @param kaution Database column kaution DBType(VARCHAR), Length(45,true)
+    *  @param etc Database column etc DBType(VARCHAR), Length(45,true)
+    *  @param wohnobjectDictionaryId Database column wohnobject_dictionary_id DBType(INT) */
+  case class WohnobjectStateRow(id: Int, dateAdded: java.sql.Timestamp, miete: String, kaution: String, etc: String, wohnobjectDictionaryId: Int)
+  /** GetResult implicit for fetching WohnobjectStateRow objects using plain SQL queries */
+  implicit def GetResultWohnobjectStateRow(implicit e0: GR[Int], e1: GR[java.sql.Timestamp], e2: GR[String]): GR[WohnobjectStateRow] = GR{
+    prs => import prs._
+      WohnobjectStateRow.tupled((<<[Int], <<[java.sql.Timestamp], <<[String], <<[String], <<[String], <<[Int]))
+  }
+  /** Table description of table wohnobject_state. Objects of this class serve as prototypes for rows in queries. */
+  class WohnobjectState(_tableTag: Tag) extends Table[WohnobjectStateRow](_tableTag, "wohnobject_state") {
+    def * = (id, dateAdded, miete, kaution, etc, wohnobjectDictionaryId) <> (WohnobjectStateRow.tupled, WohnobjectStateRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (id.?, dateAdded.?, miete.?, kaution.?, etc.?, wohnobjectDictionaryId.?).shaped.<>({r=>import r._; _1.map(_=> WohnobjectStateRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id DBType(INT), AutoInc, PrimaryKey */
+    val id: Column[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column date_added DBType(DATETIME) */
+    val dateAdded: Column[java.sql.Timestamp] = column[java.sql.Timestamp]("date_added")
+    /** Database column miete DBType(VARCHAR), Length(45,true) */
+    val miete: Column[String] = column[String]("miete", O.Length(45,varying=true))
+    /** Database column kaution DBType(VARCHAR), Length(45,true) */
+    val kaution: Column[String] = column[String]("kaution", O.Length(45,varying=true))
+    /** Database column etc DBType(VARCHAR), Length(45,true) */
+    val etc: Column[String] = column[String]("etc", O.Length(45,varying=true))
+    /** Database column wohnobject_dictionary_id DBType(INT) */
+    val wohnobjectDictionaryId: Column[Int] = column[Int]("wohnobject_dictionary_id")
+  }
+  /** Collection-like TableQuery object for table WohnobjectState */
+  lazy val WohnobjectState = new TableQuery(tag => new WohnobjectState(tag))
 
   /** Entity class storing rows of table Wohnobjekt
     *  @param id Database column id DBType(INT UNSIGNED), AutoInc, PrimaryKey

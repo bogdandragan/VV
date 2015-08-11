@@ -11,9 +11,57 @@
                 </div>
             </div>
         </nav>
-
+        <div class="list-group col-lg-2" style="margin-left: 20px;">
+            <a href="#" id="schnell" class="list-group-item active">
+                Schnellsuche
+            </a>
+            <a href="#" id="detail" class="list-group-item">
+                Detailsuche
+            </a>
+        </div>
         <div class="container well">
-        <form class="form-horizontal" id="filter">
+            <form class="form-horizontal" id="schnellsuche" style="display : block;">
+                <fieldset>
+                    <legend>Filter</legend>
+                    <div class="form-group">
+                        <label for="parameter" class="col-xs-2 control-label">Parameter:</label>
+                        <div class="col-xs-10">
+                            <input type="text" class="form-control" id="parameter">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="radio" class="col-xs-2 control-label"></label>
+                        <div class="col-xs-10">
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" name="options" id="vermieter" value="vermieter" checked="">
+                                    Vermieter
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" name="options" id="verwalter" value="verwalter">
+                                    Verwalter
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" name="options" id="alle" value="alle">
+                                    Alle
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-10 col-lg-offset-2">
+                            <button type="submit" class="btn btn-primary">Daten zeigen</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+
+
+        <form class="form-horizontal" id="detailsuche" style="display : none;">
             <fieldset>
                 <legend>Filter</legend>
             <div class="form-group">
@@ -61,7 +109,7 @@
         $(document).ready(function(){
             $.ajax({
                 type: "POST",
-                url: "@routes.Application.fillLand()",
+                url: "@routes.Search.fillLand()",
                 success: function(data){
                    // console.log(data);
                     var items = '';
@@ -74,31 +122,126 @@
             });
         });
         </script>
+
         <script>
-           $("#filter").submit(function(event){
+            $(document).ready(function(){
+                $("#schnell").click(function(){
+                    $("#schnellsuche").css("display", "block");
+                     $("#detailsuche").css("display", "none");
+                     $("#schnell").addClass("active");
+                     $("#detail").removeClass("active");
+                });
+                $("#detail").click(function(){
+                     $("#schnellsuche").css("display", "none");
+                     $("#detailsuche").css("display", "block");
+                      $("#detail").addClass("active");
+                      $("#schnell").removeClass("active");
+                });
+        });
+        </script>
+
+        <script>
+           $("#schnellsuche").submit(function(event){
             event.preventDefault();
-            alert("dddd");
-            var request = {"land":$("#land").val(), "vorname":$("#vorname").val(), "nachname":$("#nachname").val(), "plz":$("#plz").val(), "ort":$("#ort").val()};
+
+            var type = $('input[name=options]:checked', '#schnellsuche').val();
+
+            var request = {"parameter":$("#parameter").val(), "type":type};
+
             $.ajax({
                 type: "POST",
-                url: "@routes.Application.filter()",
+                url: "@routes.Search.fastFilter()",
                 data: JSON.stringify(request),
                 contentType: "application/json",
                 success: function(data){
                    console.log(data);
-                   var header = '<table class="table table-hover"><thead><th>ID</th><th>LaenderId</th><th>Vornane</th><th>Nachname</th><th>Typ</th></thead><tbody>'
-                   var body = '';
+                  var header = '<table id="searchRes" class="table table-hover"><thead><th>ID</th><th>Vornane</th><th>Nachname</th><th>Typ</th></thead><tbody>';
+                    var body = '';
                    $.each(data, function(key, value){
-                        body += '<tr><td>'+value.id+'</td><td>'+value.laenderId+'</td><td>'+value.vorname+'</td><td>'+value.nachname+'</td><td>'+value.bezeichnung+'</td></tr>';
+                         var request = {"uid":"309309"};
+                         $.ajax({
+                            type: "POST",
+                            url: "@routes.Search.checkAdded()",
+                            data: JSON.stringify(request),
+                            contentType: "application/json",
+                            success: function(resp){
+                                console.log(resp);
+                                if(resp.added == "1"){
+                                    body += '<tr class="warning"><td id="uid">'+value.id+'</td><td>'+value.vorname+'</td><td>'+value.nachname+'</td><td>'+value.bezeichnung+'</td></tr>';
+                                }
+                                else{
+                                    body += '<tr><td id="uid">'+value.id+'</td><td>'+value.vorname+'</td><td>'+value.nachname+'</td><td>'+value.bezeichnung+'</td></tr>';
+                                }
+                            }
+                       });
                     });
-                   var footer = '</tbody></table>'
+                   var footer = '</tbody></table>';
+                   $("#result").empty();
                    $("#result").append(header+body+footer);
                 }
             });
 
            });
-
         </script>
+
+        <script>
+           $("#detailsuche").submit(function(event){
+            event.preventDefault();
+           // alert("dddd");
+            var request = {"land":$("#land").val(), "vorname":$("#vorname").val(), "nachname":$("#nachname").val(), "plz":$("#plz").val(), "ort":$("#ort").val()};
+            $.ajax({
+                type: "POST",
+                url: "@routes.Search.filter()",
+                data: JSON.stringify(request),
+                contentType: "application/json",
+                success: function(data){
+                   console.log(data);
+                   var header = '<table id="searchRes" class="table table-hover"><thead><th>ID</th><th>Vornane</th><th>Nachname</th><th>Typ</th></thead><tbody>'
+                   var body = '';
+                   $.each(data, function(key, value){
+                        body += '<tr><td id="uid">'+value.id+'</td><td>'+value.vorname+'</td><td>'+value.nachname+'</td><td>'+value.bezeichnung+'</td></tr>';
+                    });
+                   var footer = '</tbody></table>'
+                   $("#result").empty()
+                   $("#result").append(header+body+footer);
+                }
+            });
+
+           });
+        </script>
+
+        <script>
+        $(document).ready(function(){
+
+            $(document).on('click','#searchRes tbody tr',function() {
+                var uid = $(this).find('td:first').text();
+               // $(this).addClass('warning');
+                //return;
+                alert(uid);
+                var request = {"uid":uid};
+
+                var isAdded;
+               $.ajax({
+                type: "POST",
+                url: "@routes.Search.addUser()",
+                data: JSON.stringify(request),
+                contentType: "application/json",
+                success: function(data){
+                    console.log(data);
+                    isAdded = data.added;
+                }
+              });
+
+                if(isAdded == "1"){
+                    alert(isAdded);
+                     $(this).addClass('warning');
+                }
+
+            });
+
+        });
+        </script>
+
 
     </body>
 </html>
